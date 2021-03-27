@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style/style.css">
+    <title>HW_4_3</title>
+</head>
+<body>
+    <div id="outer">
+        <div id="container"></div>
+        <div id="description">
+            <p class="description-text">Текущие координаты внутри контейнера:</p>
+            <p id="X" class="description-text"></p>
+            <p id="Y" class="description-text"></p>
+        </div>
+    </div>
+    <script>
+        let _containerEl = document.getElementById('container');
+        let _timer;
+        const CONTAINER_HEIGTH = parseInt(getComputedStyle(_containerEl).height);
+        const CONTAINER_WIDTH = parseInt(getComputedStyle(_containerEl).width);
+        const BALL_SIZE = 45;
+        const BORDER_THICKNESS = 5;
+
+        prepareGame();
+
+        function prepareGame(){
+            let ball = initBall();
+            startGame(ball);
+        }
+
+        function startGame(ball){
+            getRandomDirection(ball);
+            let timer = setInterval(() => {
+                getRandomDirection(ball);
+            }, 5000); 
+        }
+
+        function getRandomDirection(ball){
+            clearInterval(_timer);
+            switch (getRandomNumber(4)) {
+                case 0:
+                    muveDown(ball);
+                    break;
+                case 1:
+                    muveUp(ball);
+                    break;
+                case 2:
+                    muveRight(ball);
+                    break;
+                case 3:
+                    muveLeft(ball);
+                    break;
+            }
+        }
+
+        function initBall(){
+            let ball = document.createElement('div');
+            ball.id = 'ball';
+            ball.style.top = getRandomHeigth();
+            ball.style.left = getRandomWidth();
+
+            _containerEl.append(ball); 
+
+            startDisplayBallPosition();
+
+            return ball;
+        }
+
+        function muveUp(ball){
+            _timer = setInterval(() => {
+                let ballTop = parseInt(getComputedStyle(ball).top);
+                ball.style.top = --ballTop + 'px';
+
+                if(ballTop == BORDER_THICKNESS) {
+                    clearInterval(_timer);
+                    changeColor(ball);
+                    muveDown(ball);
+                }
+            }, 1); 
+        }
+
+        function muveDown(ball){
+            _timer = setInterval(() => {
+                let ballTop = parseInt(getComputedStyle(ball).top);
+                ball.style.top = ++ballTop + 'px';
+
+                if(ballTop == CONTAINER_HEIGTH - BALL_SIZE) {
+                    clearInterval(_timer);
+                    changeColor(ball);
+                    muveUp(ball);
+                }
+            }, 1); 
+        }
+
+        function muveRight(ball){
+            _timer = setInterval(() => {
+                let ballLeft = parseInt(getComputedStyle(ball).left);
+                ball.style.left = ++ballLeft + 'px';
+
+                if(ballLeft >= CONTAINER_WIDTH - BALL_SIZE) {
+                    clearInterval(_timer);
+                    changeColor(ball);
+                    muveLeft(ball);
+                }
+            }, 1); 
+        }
+
+        function muveLeft(ball){
+            _timer = setInterval(() => {
+                let ballLeft = parseInt(getComputedStyle(ball).left);
+                ball.style.left = --ballLeft + 'px';
+
+                if(ballLeft == BORDER_THICKNESS) {
+                    clearInterval(_timer);
+                    changeColor(ball);
+                    muveRight(ball);
+                }
+            }, 1); 
+        }
+
+        function changeColor(ball){
+            ball.style.backgroundColor = `rgb(${getRandomNumber(255)}, ${getRandomNumber(255)}, ${getRandomNumber(255)})`;
+            shadowAction();
+        }
+
+        function shadowAction(){
+            _containerEl.classList.remove('shadow-none');
+            _containerEl.classList.toggle('shadow');
+
+            let timer = setInterval(() => {
+                _containerEl.classList.toggle('shadow');
+                _containerEl.classList.toggle('shadow-none');
+                clearInterval(timer);
+            }, 100); 
+        }
+
+        // Вывод координат шара на экран
+        function startDisplayBallPosition(){
+            let ball = document.getElementsByTagName('div')[2];
+            let x = document.getElementById('X');
+            let y = document.getElementById('Y');
+
+            setInterval(() =>{
+               x.innerText = 'Current X: ' + ball.style.left;
+               y.innerText = 'Current Y: ' + ball.style.top;
+            }, 1);
+        }
+
+        function getRandomHeigth() { return getRandomNumber(CONTAINER_HEIGTH - 41) + 'px'; }
+        function getRandomWidth() { return getRandomNumber(CONTAINER_WIDTH - 41) + 'px'; }
+
+        function getRandomNumber(maxNumber){
+            return Math.floor(Math.random() * maxNumber);
+        }
+    </script>
+</body>
+</html>
